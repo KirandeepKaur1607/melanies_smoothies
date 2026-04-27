@@ -29,4 +29,13 @@ if ingredients_list:
             VALUES ('{ingredients_string}', '{name_on_order}')
         """).collect()
 
+import requests
+import streamlit as st
+
+smoothiefroot_response = requests.get(
+    "https://my.smoothiefroot.com/api/fruit/watermelon"
+)
+
+st.write(smoothiefroot_response.json())
+
         st.success(f"{name_on_order}, Your Smoothie is ordered! ✅")
