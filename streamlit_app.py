@@ -38,4 +38,8 @@ smoothiefroot_response = requests.get(
 
 st.write(smoothiefroot_response.json())
 
-        st.success(f"{name_on_order}, Your Smoothie is ordered! ✅")
+st.success(f"{name_on_order}, Your Smoothie is ordered! ✅")
+
+
+
+
