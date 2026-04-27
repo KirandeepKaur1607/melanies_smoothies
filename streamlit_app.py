@@ -1,5 +1,6 @@
 import streamlit as st
 import requests
+import pandas as pd
 from snowflake.snowpark.functions import col
 
 st.title("Customize your Smoothie!")
@@ -18,12 +19,14 @@ my_dataframe = session.table("SMOOTHIES.PUBLIC.FRUIT_OPTIONS").select(
     col("SEARCH_ON")
 )
 
+# Pandas version of my_dataframe
+pd_df = my_dataframe.to_pandas()
+
 # Show dataframe for testing
-st.dataframe(data=my_dataframe, use_container_width=True)
+st.dataframe(data=pd_df, use_container_width=True)
 
 # Create fruit name list for multiselect
-fruit_rows = my_dataframe.collect()
-fruit_list = [row["FRUIT_NAME"] for row in fruit_rows]
+fruit_list = pd_df["FRUIT_NAME"].tolist()
 
 ingredients_list = st.multiselect(
     "Choose upto 5 ingredients:",
@@ -37,12 +40,10 @@ if ingredients_list:
     for fruit_chosen in ingredients_list:
         ingredients_string += fruit_chosen + ' '
 
-        # Find SEARCH_ON value for selected fruit
-        search_on = fruit_chosen
-        for row in fruit_rows:
-            if row["FRUIT_NAME"] == fruit_chosen:
-                search_on = row["SEARCH_ON"]
-                break
+        # Find SEARCH_ON value using pandas
+        search_on = pd_df.loc[
+            pd_df["FRUIT_NAME"] == fruit_chosen, "SEARCH_ON"
+        ].iloc[0]
 
         st.subheader(fruit_chosen + " Nutrition Information")
 
