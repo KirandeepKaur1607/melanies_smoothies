@@ -13,24 +13,18 @@ session = conn.session()
 name_on_order = st.text_input("Name on Smoothie")
 st.write("The current smoothie name is", name_on_order)
 
-# Fruit list from Snowflake (include SEARCH_ON)
+# Fruit list from Snowflake
 my_dataframe = session.table("SMOOTHIES.PUBLIC.FRUIT_OPTIONS").select(
     col("FRUIT_NAME"),
     col("SEARCH_ON")
 )
 
-# Pandas version of my_dataframe
+# Convert Snowpark DataFrame to Pandas DataFrame
 pd_df = my_dataframe.to_pandas()
 
-# Show dataframe for testing
-st.dataframe(data=pd_df, use_container_width=True)
-
-# Create fruit name list for multiselect
-fruit_list = pd_df["FRUIT_NAME"].tolist()
-
 ingredients_list = st.multiselect(
-    "Choose upto 5 ingredients:",
-    fruit_list,
+    "Choose up to 5 ingredients:",
+    pd_df["FRUIT_NAME"].tolist(),
     max_selections=5
 )
 
@@ -40,10 +34,18 @@ if ingredients_list:
     for fruit_chosen in ingredients_list:
         ingredients_string += fruit_chosen + ' '
 
-        # Find SEARCH_ON value using pandas
         search_on = pd_df.loc[
-            pd_df["FRUIT_NAME"] == fruit_chosen, "SEARCH_ON"
+            pd_df['FRUIT_NAME'] == fruit_chosen,
+            'SEARCH_ON'
         ].iloc[0]
+
+        st.write(
+            'The search value for ',
+            fruit_chosen,
+            ' is ',
+            search_on,
+            '.'
+        )
 
         st.subheader(fruit_chosen + " Nutrition Information")
 
