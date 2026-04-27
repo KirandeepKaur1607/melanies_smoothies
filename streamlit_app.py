@@ -22,9 +22,20 @@ ingredients_list = st.multiselect(
     max_selections=5
 )
 
-# Submit logic
 if ingredients_list:
-    ingredients_string = " ".join(ingredients_list)
+    ingredients_string = ''
+
+    for fruit_chosen in ingredients_list:
+        ingredients_string += fruit_chosen + ' '
+
+    smoothiefroot_response = requests.get(
+        "https://my.smoothiefroot.com/api/fruit/watermelon"
+    )
+
+    st.dataframe(
+        data=smoothiefroot_response.json(),
+        use_container_width=True
+    )
 
     if st.button("Submit Order"):
         session.sql(f"""
@@ -33,13 +44,3 @@ if ingredients_list:
         """).collect()
 
         st.success(f"{name_on_order}, Your Smoothie is ordered! ✅")
-
-# API data (always visible)
-smoothiefroot_response = requests.get(
-    "https://my.smoothiefroot.com/api/fruit/watermelon"
-)
-
-st.dataframe(
-    data=smoothiefroot_response.json(),
-    use_container_width=True
-)
